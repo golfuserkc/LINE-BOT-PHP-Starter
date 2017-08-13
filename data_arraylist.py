@@ -3,10 +3,13 @@
 import PyICU
 import pymysql
 import pymysql
+
+
 conn = pymysql.connect(host='127.0.0.1', user='root', passwd='', db='projectone',charset = "utf8mb4")
 # conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd=None, db='mysql')
+
 def warp_split(str):
-    str.replace(" ", "")
+    str.replace(" ","")
     tmp = warp(str).split("|")
     return tmp
 
@@ -15,7 +18,6 @@ def isThai(chr):
     if (cVal >= 3584 and cVal <= 3711):
         return True
     return False
-
 
 def warp(txt):
     # print(txt)
@@ -98,11 +100,17 @@ arraylist_kebcount = []
 for i in range(len(data)):
     nubkummean = 0
     for c in arraylist_inkebkum[i]:
-        for n in arraylist_kebkum[0]:
+        print(c)
+        for n in arraylist_kebkum:
+
             if(n==c):
+                # print(n)
+                # print("---")
+                # print(c)
                 nubkummean+=1
     id[i] = [id[i],nubkummean]
     print(id[i])
+    nubkummean = 0
 
 """
 #for c in arraylist_inkebkum:
