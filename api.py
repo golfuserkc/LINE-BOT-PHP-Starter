@@ -38,7 +38,7 @@ def sendText(user, text):
         "replyToken": user,
         "messages": [{
             "type": "text",
-            "text": text
+            "text": "wowww"
         }]
     })
 
