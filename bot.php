@@ -1,47 +1,51 @@
-<?php
-$access_token = 'V1W7Nva5xxPQJaJvLxj2lUFoHR8QXrhfjHvN343H2JWr0+Q6HphNbRBG/KB8TiIK2ziMKLIo5BwRWT9dwSKMMzApjKgPQCrVuF5yWkwcy9YFory4qL7HwAeVBRRWgYX40ky4kqrc0VXkbrRvhXAgiQdB04t89/1O/w1cDnyilFU=';
+from flask import Flask, request
+import json
+import requests
 
-// Get POST body content
-$content = file_get_contents('php://input');
-// Parse JSON
-$events = json_decode($content, true);
-// Validate parsed JSON data
-if (!is_null($events['events'])) {
-	// Loop through each event
-	foreach ($events['events'] as $event) {
-		// Reply only when message sent is in 'text' format
-		if ($event['type'] == 'message' && $event['message']['type'] == 'text') {
-			// Get text sent
-			$text = $event['message']['text'];
-			// Get replyToken
-			$replyToken = $event['replyToken'];
 
-			// Build message to reply back
-			$messages = [
-				'type' => 'text',
-				'text' => $text
-			];
+app = Flask(__name__)
 
-			// Make a POST Request to Messaging API to reply to sender
-			$url = 'https://api.line.me/v2/bot/message/reply';
-			$data = [
-				'replyToken' => $replyToken,
-				'messages' => [$messages],
-			];
-			$post = json_encode($data);
-			$headers = array('Content-Type: application/json', 'Authorization: Bearer ' . $access_token);
 
-			$ch = curl_init($url);
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			$result = curl_exec($ch);
-			curl_close($ch);
+@app.route('/')
+def index():
+    return "Hello World!"
 
-			echo $result . "\r\n";
-		}
-	}
-}
-echo "OK";
+
+# ส่วน callback สำหรับ Webhook
+@app.route('/callback', methods=['POST'])
+def callback():
+    json_line = request.get_json()
+    json_line = json.dumps(json_line)
+    decoded = json.loads(json_line)
+    user = decoded["events"][0]['replyToken']
+    # id=[d['replyToken'] for d in user][0]
+    # print(json_line)
+    print("ผู้ใช้：", user)
+    sendText(user, 'ระบบไม่รู้ความหมายคำที่ท่านค้นหา กรุณาพิมคำค้นใหม่')  # ส่งข้อความ งง
+    return '', 200
+
+
+def sendText(user, text):
+    LINE_API = 'https://api.line.me/v2/bot/message/reply'
+    Authorization = 'zvHtu44fUXRqjEFJU9IDjJXOytqwjRGY+EY62H2vYMqWjmNm3BPpdHcsdHtBHI9g2ziMKLIo5BwRWT9dwSKMMzApjKgPQCrVuF5yWkwcy9ZXTKFgo44GbuEENQqc6sJjMY8x2BIpSDM057ERtGrWVAdB04t89/1O/w1cDnyilFU='  # ใส่ ENTER_ACCESS_TOKEN เข้าไป
+
+    headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': Authorization
+    }
+
+    data = json.dumps({
+        "replyToken": user,
+        "messages": [{
+            "type": "text",
+            "text": "wowww"
+        }]
+    })
+
+    # print("ข้อมูล：",data)
+    r = requests.post(LINE_API, headers=headers, data=data)  # ส่งข้อมูล
+    # print(r.text)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
